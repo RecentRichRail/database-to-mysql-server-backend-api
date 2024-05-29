@@ -1,0 +1,7 @@
+Flask
+gunicorn
+requests
+pyjwt
+load_dotenv
+pymsql
+flask_sqlalchemy
