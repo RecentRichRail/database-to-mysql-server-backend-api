@@ -4,3 +4,4 @@ requests
 pyjwt
 load_dotenv
 flask_sqlalchemy
+pymysql
