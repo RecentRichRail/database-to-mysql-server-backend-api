@@ -10,6 +10,7 @@ from resources.settings import blp as SettingsBlueprint
 from resources.commands import blp as CommandsBlueprint
 from resources.search import blp as SearchBlueprint
 from resources.user import blp as UserBlueprint
+from resources.banana_game import blp as BananaGameBlueprint
 
 load_dotenv()
 
@@ -45,6 +46,7 @@ app.register_blueprint(SettingsBlueprint)
 app.register_blueprint(CommandsBlueprint)
 app.register_blueprint(SearchBlueprint)
 app.register_blueprint(UserBlueprint)
+app.register_blueprint(BananaGameBlueprint)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=host_port, debug=True)

@@ -2,3 +2,8 @@ from models.commands import CommandsModel
 from models.requests import RequestsModel
 from models.users import UsersModel
 from models.login_attempts import LoginAttemptModel
+
+
+from models.banana_game.banana_game_button_press import BananaGameButtonPressModel
+from models.banana_game.banana_game_user_bananas_lifetime import BananaGameLifetimeBananasModel
+from models.banana_game.banana_game_user_bananas import BananaGameUserBananasModel
