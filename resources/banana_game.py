@@ -26,7 +26,7 @@ def create_user_with_id(user_id):
 def is_user_allowed():
     jwt_token = request.json.get("jwt")
 
-    response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/verify_user_jwt", json={"jwt": jwt_token, "request_url": request.url, "request_ip_source": request.headers.get('X-Forwarded-For', request.remote_addr)})
+    response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/verify_user_jwt", json={"jwt": jwt_token, "need_logged": False})
     verification_result = response.json()
     user_id = verification_result['id']
 
