@@ -3,7 +3,7 @@ from db import db
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timezone
 
-from models import LoginAttemptModel
+from models import LoginAttemptModel, UsersModel
 
 blp = Blueprint('login', __name__)
 
