@@ -7,3 +7,7 @@ from models.login_attempts import LoginAttemptModel
 from models.banana_game.banana_game_button_press import BananaGameButtonPressModel
 from models.banana_game.banana_game_user_bananas_lifetime import BananaGameLifetimeBananasModel
 from models.banana_game.banana_game_user_bananas import BananaGameUserBananasModel
+
+from models.devices.device_information import DevicesSerialNumberModel
+from models.devices.device_information_last_check_in import DevicesLastCheckInModel
+from models.devices.device_information_network import DevicesNetworkModel
