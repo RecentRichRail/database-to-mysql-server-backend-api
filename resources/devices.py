@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
-import requests
+import requests, hmac
 # from models import 
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
@@ -9,11 +9,27 @@ from models import DevicesSerialNumberModel, DevicesLastCheckInModel, DevicesNet
 
 blp = Blueprint('devices', __name__)
 
+@blp.route("/apiv1/devices/send_command", methods=['POST'])
+def send_command():
+    # It can be a command that is added to the database, When the device checks in, it will get the command and execute it.
+    # This also needs to verify the source of the command. We can use the JWT token for this.
+    # If the user of the JWT token is an admin, then they can send commands.
+    # These commands need to be logged with IP, User ID, Permission Level, Command, Device, and Time.
+    # Only the most recent command will be executed. The rest need to be logged and ignored.
+    # If there is a power on command then this needs to send a WOL packet to the device.
+    return {"message": "Send command not available at this time."}
+
+@blp.route("/apiv1/devices/check_in", methods=['POST'])
+def check_in():
+    # Needs to return either action or last check in time.
+    # Check in needs the serial number and the unique identifier verification key, and IP address.
+    return {"message": "Check in not available at this time."}
+
 @blp.route("/apiv1/devices/create_device", methods=['POST'])
 def create_device():
     serial_number = request.json.get("serial_number")
     public_verification_key = request.json.get("public_verification_key")
-    if public_verification_key != current_app.public_verification_key:
+    if not hmac.compare_digest(public_verification_key, current_app.public_verification_key):
         return jsonify({"error": "Unable to verify source."})
     unique_identifier_verification_key = request.json.get("unique_identifier_verification_key")
     ip_address = request.json.get("ip_address")
