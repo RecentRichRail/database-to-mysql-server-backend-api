@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
-from models import UsersModel, CommandsModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel
+from models import UsersModel, CommandsModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel, RequestsModel
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+from sqlalchemy import desc
 
 # from models import CommandsModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel
 
@@ -63,6 +64,36 @@ def get_user():
             "default_search_id": user_query.default_search_id}
 
     return jsonify(user_query.to_dict())
+
+@blp.route("/apiv1/data/user/search/history", methods=['POST'])
+def get_user_search_history():
+    jwt_token = request.json.get("jwt")
+
+    response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
+    user_sub = response.json()
+
+    user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
+    user_history_query = RequestsModel.query.filter_by(user_id=user_sub['sub']).order_by(RequestsModel.id.desc()).all()
+
+    if not user_query:
+        user_query = create_user(user_sub)
+    else:
+        user_history_query_structured = {user_sub['sub']: {}}
+        for history_request in user_history_query:
+            if history_request.is_search == True:
+                user_query_url = history_request.command.search_url.format(history_request.encoded_query)
+            elif history_request.is_search == False:
+                user_query_url = history_request.command.url
+
+            user_history_query_structured[user_sub['sub']][history_request.id] = {
+                "request_id": history_request.id,
+                "original_request": history_request.original_request,
+                "query_url": user_query_url,
+                "date_and_time": history_request.datetime_of_request
+            }
+
+    print(user_history_query_structured)
+    return user_history_query_structured
 
 @blp.route("/apiv1/data/user/default_search", methods=['POST'])
 def get_user_default_search():
