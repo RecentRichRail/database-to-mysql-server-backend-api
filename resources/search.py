@@ -42,9 +42,13 @@ def track_request():
     data = request.get_json()
     print(f"data recieved: {data}")
 
+    track_query = TrackingNumbersModel.query.filter_by(prefix=data.get('prefix', "Error").upper()).first()
+    if track_query:
+        return {"message": "Track request previously recorded."}
+
     request_dict = {
         "user_id": data.get('user_id', "Error"),
-        "tracking_number": data.get('prefix', "Error"),
+        "tracking_number": data.get('prefix', "Error").upper(),
         "datetime_of_create_on_database": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
             }
 
