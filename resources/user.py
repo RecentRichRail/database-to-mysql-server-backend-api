@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
-from models import UsersModel, CommandsModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel, RequestsModel
+from models import UsersModel, CommandsModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel, RequestsModel, TrackingNumbersModel, TrackingIdentificationModel
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
@@ -94,6 +94,35 @@ def get_user_search_history():
 
     print(user_history_query_structured)
     return user_history_query_structured
+
+@blp.route("/apiv1/data/user/search/track", methods=['POST'])
+def get_user_track_history():
+    jwt_token = request.json.get("jwt")
+
+    response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
+    user_sub = response.json()
+
+    user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
+    user_track_query = TrackingNumbersModel.query.filter_by(user_id=user_sub['sub']).order_by(user_track_query.id.desc()).all()
+
+    if not user_query:
+        user_query = create_user(user_sub)
+    else:
+        user_track_query_structured = {user_sub['sub']: {}}
+        for track_request in user_track_query:
+            track_query = TrackingIdentificationModel.query.all()
+            for tracking in track_query:
+                if tracking.prefix.upper() in track_request.tracking_number.upper():
+                    user_track_query_structured[user_sub['sub']][track_request.id] = {
+                        "track_id": track_request.id,
+                        "tracking_number": track_request.tracking_number,
+                        "query_url": tracking.search_url.format(track_request.tracking_number),
+                        "is_active": track_request.is_active,
+                        "datetime_of_create_on_database": track_request.datetime_of_create_on_database
+                    }
+
+    print(user_track_query_structured)
+    return user_track_query_structured
 
 @blp.route("/apiv1/data/user/default_search", methods=['POST'])
 def get_user_default_search():
