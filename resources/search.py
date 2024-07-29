@@ -42,7 +42,7 @@ def track_request():
     data = request.get_json()
     print(f"data recieved: {data}")
 
-    track_query = TrackingNumbersModel.query.filter_by(prefix=data['prefix'].upper()).first()
+    track_query = TrackingNumbersModel.query.filter_by(tracking_number=data['prefix'].upper()).first()
     if track_query:
         return {"message": "Track request previously recorded."}
 
