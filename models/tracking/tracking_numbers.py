@@ -7,6 +7,7 @@ class TrackingNumbersModel(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=False, nullable=False, autoincrement=True)
     tracking_number = db.Column(db.String(500), nullable=False)
     user_id = db.Column(db.String(80), db.ForeignKey("users.id"), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean)
     datetime_of_create_on_database = db.Column(db.DateTime, unique=False, nullable=True, default=datetime.utcnow)
 
     def to_dict(self):

@@ -45,7 +45,7 @@ def track_request():
     request_dict = {
         "user_id": data.get('user_id', "Error"),
         "tracking_number": data.get('prefix', "Error"),
-        "datetime_of_request": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+        "datetime_of_create_on_database": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
             }
 
     print("track_request data = ", request_dict)
@@ -55,9 +55,9 @@ def track_request():
     try:
         db.session.add(request_model)
         db.session.commit()
-        print("Search request recorded.")
-        return {"message": "Search request recorded."}
+        print("Track request recorded.")
+        return {"message": "Track request recorded."}
     except SQLAlchemyError as e:
         print(e)
         print("Failed to record search request.")
-        return {"message": "Failed to record search request."}
+        return {"message": "Failed to record track request."}
