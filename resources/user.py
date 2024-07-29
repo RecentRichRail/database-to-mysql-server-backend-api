@@ -103,7 +103,7 @@ def get_user_track_history():
     user_sub = response.json()
 
     user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
-    user_track_query = TrackingNumbersModel.query.filter_by(user_id=user_sub['sub']).order_by(user_track_query.id.desc()).all()
+    user_track_query = TrackingNumbersModel.query.filter_by(user_id=user_sub['sub']).order_by(TrackingNumbersModel.id.desc()).all()
 
     if not user_query:
         user_query = create_user(user_sub)
