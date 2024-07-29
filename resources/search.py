@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from datetime import datetime, timezone
 
 from db import db
-from models import RequestsModel
+from models import RequestsModel, TrackingNumbersModel
 from sqlalchemy.exc import SQLAlchemyError
 
 blp = Blueprint('search', __name__)
@@ -26,6 +26,31 @@ def search_request():
     print("search_request data = ", request_dict)
 
     request_model = RequestsModel(**request_dict)
+
+    try:
+        db.session.add(request_model)
+        db.session.commit()
+        print("Search request recorded.")
+        return {"message": "Search request recorded."}
+    except SQLAlchemyError as e:
+        print(e)
+        print("Failed to record search request.")
+        return {"message": "Failed to record search request."}
+    
+@blp.route("/apiv1/search/track_request", methods=['POST'])
+def track_request():
+    data = request.get_json()
+    print(f"data recieved: {data}")
+
+    request_dict = {
+        "user_id": data.get('user_id', "Error"),
+        "tracking_number": data.get('prefix', "Error"),
+        "datetime_of_request": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+            }
+
+    print("track_request data = ", request_dict)
+
+    request_model = TrackingNumbersModel(**request_dict)
 
     try:
         db.session.add(request_model)

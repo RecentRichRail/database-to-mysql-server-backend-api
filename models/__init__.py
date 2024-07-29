@@ -1,7 +1,10 @@
-from models.commands import CommandsModel
-from models.requests import RequestsModel
-from models.users import UsersModel
-from models.login_attempts import LoginAttemptModel
+from models.search.commands import CommandsModel
+from models.search.requests import RequestsModel
+from models.user.users import UsersModel
+from models.user.login_attempts import LoginAttemptModel
+
+from models.tracking.tracking_numbers import TrackingNumbersModel
+from models.tracking.tracking_identification import TrackingIdentificationModel
 
 
 from models.banana_game.banana_game_button_press import BananaGameButtonPressModel

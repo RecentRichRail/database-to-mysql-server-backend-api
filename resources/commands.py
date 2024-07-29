@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
 
-from models import CommandsModel
+from models import CommandsModel, TrackingIdentificationModel
 
 blp = Blueprint('commands', __name__)
 
@@ -33,6 +33,11 @@ def get_command(command_prefix):
 
     cmd_query = CommandsModel.query.filter_by(prefix=command_prefix).first()
     if not cmd_query:
+        track_query = TrackingIdentificationModel.query.all()
+        for tracking in track_query:
+            if tracking.prefix in command_prefix:
+                tracking["category"] = "tracking"
+                return tracking.to_dict()
         return {"message": "Command not found"}
     else:
         return cmd_query.to_dict()
