@@ -36,8 +36,9 @@ def get_command(command_prefix):
         track_query = TrackingIdentificationModel.query.all()
         for tracking in track_query:
             if tracking.prefix.upper() in command_prefix.upper():
-                tracking["category"] = "tracking"
-                return tracking.to_dict()
+                return_tracking = tracking.to_dict()
+                return_tracking["category"] = "tracking"
+                return return_tracking
         return {"message": "Command not found"}
     else:
         return cmd_query.to_dict()
