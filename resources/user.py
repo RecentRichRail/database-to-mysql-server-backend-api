@@ -112,11 +112,12 @@ def get_user_track_history():
         user_track_query_structured = {user_sub['sub']: {}}
         for track_request in user_track_query:
             tracking = get_tracking_number(track_request.tracking_number)
-            tracking_url = tracking.tracking_url
+            # tracking_url = tracking.tracking_url
             user_track_query_structured[user_sub['sub']][track_request.id] = {
                 "track_id": track_request.id,
                 "tracking_number": track_request.tracking_number,
-                "query_url": tracking_url,
+                "query_url": tracking.tracking_url,
+                "courier_name": tracking.courier.name,
                 "is_active": track_request.is_active,
                 "datetime_of_create_on_database": track_request.datetime_of_create_on_database
             }
