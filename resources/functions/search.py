@@ -21,8 +21,8 @@ def run(data):
     user_query['encoded_query'] = urllib.parse.quote_plus(user_query['search_query'])
     user_query['is_search'] = True
 
-    user_model = UsersModel.query.filter_by(id=user_info['user_id']).first()
-    user_command_model = CommandsModel.query.filter_by(id=user_model.default_search_id).first()
+    # user_model = UsersModel.query.filter_by(id=user_info['default_search_id']).first()
+    user_command_model = CommandsModel.query.filter_by(id=user_info['default_search_id']).first()
     user_command = user_command_model.to_dict()
 
     if current_app.allow_logging:
