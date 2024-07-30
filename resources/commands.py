@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
 
-from models import CommandsModel, TrackingIdentificationModel
+from models import CommandsModel
 
 blp = Blueprint('commands', __name__)
 
