@@ -25,6 +25,13 @@ def user_search_query():
     data = request.get_json()
     print(f"Data received: {data}")
 
+    data['user_query']['prefix'] = data['user_query']['original_request'].split(' ')[0].lower()
+
+    # Should be how the data looks:
+    # data = {'user_query': {'prefix': 'yellow', 'original_request': 'yellow cab'}, 'user_info': {'user_id': 'ID12345'}}
+    # After tracking.py:
+    # data = {'user_query': {'original_request': 'yellow cab', 'prefix': 'yellow'}, 'user_info': {'user_id': 'ID12345'}, 'tracking_details': None}
+
     for filename in os.listdir('resources/functions'):
         if filename.endswith('.py') and filename != 'search.py':
             print(f"Running {filename}")

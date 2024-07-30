@@ -111,9 +111,6 @@ def get_user_track_history():
     else:
         user_track_query_structured = {user_sub['sub']: {}}
         for track_request in user_track_query:
-            # track_query = TrackingIdentificationModel.query.all()
-            # for tracking in track_query:
-            # if track_request.tracking_number in track_request.tracking_number.upper():
             tracking = get_tracking_number(track_request.tracking_number)
             tracking_url = tracking.tracking_url
             user_track_query_structured[user_sub['sub']][track_request.id] = {

@@ -1,20 +1,14 @@
-import urllib.parse
-from flask import Blueprint, current_app, redirect, request, render_template
-import requests
-import logging
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timezone
 from tracking_numbers import get_tracking_number
 
-from models import UsersModel, CommandsModel, RequestsModel, TrackingNumbersModel
+from models import TrackingNumbersModel
 from db import db
 
 def run(data):
 
-    data['prefix'] = data['user_query'].split(' ')[0].lower()
-    logging.info(f"'{data['prefix']}' has been set as the prefix")
-
-    data['tracking_details'] = get_tracking_number(data['prefix'].upper())
+    data['tracking_details'] = get_tracking_number(data['user_query']['prefix'].upper())
+    print(f"Tracking.py data - {data}")
     if data['tracking_details'] == None:
         return {"funtion_triggered": False}
 
@@ -38,8 +32,8 @@ def run(data):
     else:
 
         request_dict = {
-            "user_id": data.get('user_id', "Error"),
-            "tracking_number": data.get('prefix', "Error").upper(),
+            "user_id": data['user_info'].get('user_id', "Error"),
+            "tracking_number": data['user_query'].get('prefix', "Error").upper(),
             "datetime_of_create_on_database": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
                 }
 
