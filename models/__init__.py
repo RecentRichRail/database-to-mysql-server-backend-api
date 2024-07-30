@@ -4,8 +4,6 @@ from models.user.users import UsersModel
 from models.user.login_attempts import LoginAttemptModel
 
 from models.tracking.tracking_numbers import TrackingNumbersModel
-from models.tracking.tracking_identification import TrackingIdentificationModel
-
 
 from models.banana_game.banana_game_button_press import BananaGameButtonPressModel
 from models.banana_game.banana_game_user_bananas_lifetime import BananaGameLifetimeBananasModel
