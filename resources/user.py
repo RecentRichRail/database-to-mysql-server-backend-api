@@ -5,6 +5,7 @@ from db import db
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 from sqlalchemy import desc
+from tracking_numbers import get_tracking_number
 
 # from models import CommandsModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel
 
@@ -110,16 +111,18 @@ def get_user_track_history():
     else:
         user_track_query_structured = {user_sub['sub']: {}}
         for track_request in user_track_query:
-            track_query = TrackingIdentificationModel.query.all()
-            for tracking in track_query:
-                if tracking.prefix.upper() in track_request.tracking_number.upper():
-                    user_track_query_structured[user_sub['sub']][track_request.id] = {
-                        "track_id": track_request.id,
-                        "tracking_number": track_request.tracking_number,
-                        "query_url": tracking.search_url.format(track_request.tracking_number),
-                        "is_active": track_request.is_active,
-                        "datetime_of_create_on_database": track_request.datetime_of_create_on_database
-                    }
+            # track_query = TrackingIdentificationModel.query.all()
+            # for tracking in track_query:
+            # if track_request.tracking_number in track_request.tracking_number.upper():
+            tracking = get_tracking_number(track_request.tracking_number)
+            tracking_url = tracking.tracking_url
+            user_track_query_structured[user_sub['sub']][track_request.id] = {
+                "track_id": track_request.id,
+                "tracking_number": track_request.tracking_number,
+                "query_url": tracking_url,
+                "is_active": track_request.is_active,
+                "datetime_of_create_on_database": track_request.datetime_of_create_on_database
+            }
 
     print(user_track_query_structured)
     return user_track_query_structured

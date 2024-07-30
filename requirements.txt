@@ -6,3 +6,4 @@ load_dotenv
 flask_sqlalchemy
 pymysql
 cryptography
+tracking_numbers
