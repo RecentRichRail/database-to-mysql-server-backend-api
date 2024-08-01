@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
-from models import UsersModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel
+from models import BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime

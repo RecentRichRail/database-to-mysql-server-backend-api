@@ -8,6 +8,7 @@ class CommandsModel(db.Model):
     prefix = db.Column(db.String(500), unique=True, nullable=False)
     url = db.Column(db.String(500))
     search_url = db.Column(db.String(500))
+    permission_level = db.Column(db.Integer, unique=False, nullable=False, default=999)
     requests = db.relationship("RequestsModel", back_populates="command", lazy="dynamic")
 
     def to_dict(self):

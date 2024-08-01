@@ -1,16 +1,10 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
 
 from models import CommandsModel
 
 blp = Blueprint('commands', __name__)
-
-@blp.route("/apiv1/commands", methods=['GET'])
-def get_commands():
-    cmd_query = CommandsModel.query.all()
-    commands = [command.to_dict() for command in cmd_query]
-    return jsonify(commands)
 
 @blp.route("/apiv1/commands/create_commands", methods=['POST'])
 def create_commands():

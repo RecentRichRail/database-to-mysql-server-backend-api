@@ -1,13 +1,10 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
-from models import UsersModel, CommandsModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel, RequestsModel, TrackingNumbersModel
+from models import UsersModel, CommandsModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel, RequestsModel, TrackingNumbersModel, PermissionsModel
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
-from sqlalchemy import desc
 from tracking_numbers import get_tracking_number
-
-# from models import CommandsModel, BananaGameUserBananasModel, BananaGameLifetimeBananasModel, BananaGameButtonPressModel
 
 blp = Blueprint('user', __name__)
 
@@ -19,12 +16,24 @@ def create_user_for_internal(user_sub):
         "email": user_sub.get('email')['address'],
         "is_email_valid": user_sub.get('email')['is_verified'],
         "default_search_id": cmd_query.id}
+    
+    permission = {"user_id": user_sub['sub'],
+                  "permission_name": "commands",
+                  "permission_level": 999}
+
+    # permission = {"user_id": user_sub['sub']}
 
     user_model = UsersModel(**user)
+    user_permissions_model = PermissionsModel(**permission)
 
+    db.session.add(user_model)
+    
     try:
-        db.session.add(user_model)
         db.session.commit()
+        print("Internal account created for user")
+        db.session.add(user_permissions_model)
+        db.session.commit()
+        print("Internal permissions created for user")
         return user
     except SQLAlchemyError as e:
         print(e)
@@ -44,27 +53,54 @@ def create_user_banana_game_with_id(user_id):
 
     try:
         db.session.commit()
+        print("Banana account created for user")
     except SQLAlchemyError as e:
         print(e)
 
 @blp.route("/apiv1/data/user", methods=['POST'])
 def get_user():
     jwt_token = request.json.get("jwt")
+    data = {}
 
-    response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
-    user_sub = response.json()
+    payload = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
+    user_sub = payload.json()
 
-    user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
+    user_query_model = UsersModel.query.filter_by(id=user_sub['sub']).first()
+    user_query = user_query_model.to_dict()
 
-    if not user_query:
-        user_query = create_user(user_sub)
-    else:
-        user = {"id": user_query.id,
-            "email": user_query.email,
-            "is_email_valid": user_query.is_email_valid,
-            "default_search_id": user_query.default_search_id}
+    data['user_info'] = {'user_id': user_sub['sub'], 'default_search_id': user_query['default_search_id'],'user_email': {'email': user_sub['email']['address'], 'is_email_valid': user_sub['email']['is_verified']}}
+    # print(data)
 
-    return jsonify(user_query.to_dict())
+    user_permissions = []
+    permissions_model = PermissionsModel.query.filter_by(user_id=user_sub['sub']).all()
+    if permissions_model:
+        for permission in permissions_model:
+            permissions_dict = permission.to_dict()
+            user_permissions.append(permissions_dict)
+    data['user_permissions'] = user_permissions
+    print(f"User Permissions = {data['user_permissions']}")
+
+    # shortcut_command_model = CommandsModel.query.filter_by(prefix=data['user_query']['prefix']).first()
+    user_commands = []
+    for permission in data['user_permissions']:
+        if permission['permission_name'] == "commands":
+            # Retrieve all commands
+            commands_model = CommandsModel.query.all()
+            # commands_model = commands_model.to_dict()
+            
+            for command in commands_model:
+                command_dict = command.to_dict()
+                
+                # Filter commands based on permission level
+                if command_dict['permission_level'] is None or command_dict['permission_level'] >= permission['permission_level']:
+                    user_commands.append(command_dict)
+                else:
+                    print(f"No permission to {command.prefix}")
+
+    data['user_commands'] = user_commands
+    print(f"Commands - {data['user_commands']}")
+
+    return jsonify(data)
 
 @blp.route("/apiv1/data/user/search/history", methods=['POST'])
 def get_user_search_history():
@@ -73,25 +109,22 @@ def get_user_search_history():
     response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
     user_sub = response.json()
 
-    user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
+    # user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
     user_history_query = RequestsModel.query.filter_by(user_id=user_sub['sub']).order_by(RequestsModel.id.desc()).all()
 
-    if not user_query:
-        user_query = create_user(user_sub)
-    else:
-        user_history_query_structured = {user_sub['sub']: {}}
-        for history_request in user_history_query:
-            if history_request.is_search == True:
-                user_query_url = history_request.command.search_url.format(history_request.encoded_query)
-            elif history_request.is_search == False:
-                user_query_url = history_request.command.url
+    user_history_query_structured = {user_sub['sub']: {}}
+    for history_request in user_history_query:
+        if history_request.is_search == True:
+            user_query_url = history_request.command.search_url.format(history_request.encoded_query)
+        elif history_request.is_search == False:
+            user_query_url = history_request.command.url
 
-            user_history_query_structured[user_sub['sub']][history_request.id] = {
-                "request_id": history_request.id,
-                "original_request": history_request.original_request,
-                "query_url": user_query_url,
-                "date_and_time": history_request.datetime_of_request
-            }
+        user_history_query_structured[user_sub['sub']][history_request.id] = {
+            "request_id": history_request.id,
+            "original_request": history_request.original_request,
+            "query_url": user_query_url,
+            "date_and_time": history_request.datetime_of_request
+        }
 
     print(user_history_query_structured)
     return user_history_query_structured
@@ -106,47 +139,48 @@ def get_user_track_history():
     user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
     user_track_query = TrackingNumbersModel.query.filter_by(user_id=user_sub['sub']).order_by(TrackingNumbersModel.id.desc()).all()
 
-    if not user_query:
-        user_query = create_user(user_sub)
-    else:
-        user_track_query_structured = {user_sub['sub']: {}}
-        for track_request in user_track_query:
-            tracking = get_tracking_number(track_request.tracking_number)
-            # tracking_url = tracking.tracking_url
-            user_track_query_structured[user_sub['sub']][track_request.id] = {
-                "track_id": track_request.id,
-                "tracking_number": track_request.tracking_number,
-                "query_url": tracking.tracking_url,
-                "courier_name": tracking.courier.name,
-                "is_active": track_request.is_active,
-                "datetime_of_create_on_database": track_request.datetime_of_create_on_database
-            }
+    # if not user_query:
+    #     user_query = create_user(user_sub)
+    # else:
+    user_track_query_structured = {user_sub['sub']: {}}
+    for track_request in user_track_query:
+        tracking = get_tracking_number(track_request.tracking_number)
+        # tracking_url = tracking.tracking_url
+        user_track_query_structured[user_sub['sub']][track_request.id] = {
+            "track_id": track_request.id,
+            "tracking_number": track_request.tracking_number,
+            "query_url": tracking.tracking_url,
+            "courier_name": tracking.courier.name,
+            "is_active": track_request.is_active,
+            "datetime_of_create_on_database": track_request.datetime_of_create_on_database
+        }
 
     print(user_track_query_structured)
     return user_track_query_structured
 
-@blp.route("/apiv1/data/user/default_search", methods=['POST'])
-def get_user_default_search():
-    jwt_token = request.json.get("jwt")
+# @blp.route("/apiv1/data/user/default_search", methods=['POST'])
+# def get_user_default_search():
+#     jwt_token = request.json.get("jwt")
 
-    response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
-    user_sub = response.json()
+#     response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
+#     user_sub = response.json()
 
-    user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
-    user_default_command_query = CommandsModel.query.filter_by(id=user_query.default_search_id).first()
+#     user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
+#     user_default_command_query = CommandsModel.query.filter_by(id=user_query.default_search_id).first()
 
-    print("User default command = ", user_default_command_query.to_dict())
+#     print("User default command = ", user_default_command_query.to_dict())
     
-    if user_default_command_query:
-        return user_default_command_query.to_dict()
-    else:
-        return {"message": "Something went wrong with userdata"}
+#     if user_default_command_query:
+#         return user_default_command_query.to_dict()
+#     else:
+#         return {"message": "Something went wrong with userdata"}
 
 @blp.route("/apiv1/data/create_user", methods=['POST'])
 def create_user():
     payload = request.json.get("payload")
 
-    user_query = UsersModel.query.filter_by(id=payload['sub']).first()
+    if payload:
+        user_query = UsersModel.query.filter_by(id=payload['sub']).first()
 
     if not user_query:
         print("Creating user account.")

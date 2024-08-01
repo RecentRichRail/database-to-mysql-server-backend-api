@@ -1,17 +1,15 @@
 import logging
-from flask import Flask, jsonify, request
+from flask import Flask
 import os
+import json
 from dotenv import load_dotenv
 
 from db import db
+import resources
 
-from resources.login import blp as LoginBlueprint
-from resources.settings import blp as SettingsBlueprint
-from resources.commands import blp as CommandsBlueprint
-from resources.search import blp as SearchBlueprint
-from resources.user import blp as UserBlueprint
-from resources.banana_game import blp as BananaGameBlueprint
-from resources.devices import blp as DevicesBlueprint
+from models import CommandsModel, PermissionsModel
+
+from sqlalchemy.exc import SQLAlchemyError
 
 load_dotenv()
 
@@ -43,13 +41,55 @@ with app.app_context():
     db.create_all()
     print("Creating database.")
 
-app.register_blueprint(LoginBlueprint)
-app.register_blueprint(SettingsBlueprint)
-app.register_blueprint(CommandsBlueprint)
-app.register_blueprint(SearchBlueprint)
-app.register_blueprint(UserBlueprint)
-app.register_blueprint(BananaGameBlueprint)
-app.register_blueprint(DevicesBlueprint)
+    try:
+        with open('src/commands.json', 'r') as file:
+            commands_data = json.load(file)
+            logging.error(f"commands.json file was loaded.")
+    except FileNotFoundError:
+        logging.error(f"{os.system('pwd')} - Could not find commands.json file.")
+        commands_data = {'commands': []}
+
+    # for single_permission in commands_data['permissons']:
+    #     for single_command_single_prefix in single_command['prefix']:
+    #         command_for_data = single_command
+    #         command_for_data['prefix'] = single_command_single_prefix
+    #         cmd_query = CommandsModel.query.filter_by(prefix=command_for_data['prefix']).first()
+    #         if not cmd_query:
+    #             command_model = CommandsModel(category=command_for_data['category'], prefix=command_for_data['prefix'], url=command_for_data['url'], search_url=command_for_data.get('search_url'))
+    #             try:
+    #                 db.session.add(command_model)
+    #                 db.session.commit()
+    #                 print("Command created successfully")
+    #             except SQLAlchemyError as e:
+    #                 print(e)
+    #         else:
+    #             print("Command already exists")
+
+    for single_command in commands_data['commands']:
+        for single_command_single_prefix in single_command['prefix']:
+            command_for_data = single_command
+            command_for_data['prefix'] = single_command_single_prefix
+            cmd_query = CommandsModel.query.filter_by(prefix=command_for_data['prefix']).first()
+            command_model = CommandsModel(category=command_for_data['category'], prefix=command_for_data['prefix'], url=command_for_data['url'], search_url=command_for_data.get('search_url'), permission_level=command_for_data.get('permission_level'))
+            if not cmd_query:
+                try:
+                    if not cmd_query:
+                        db.session.add(command_model)
+                        db.session.commit()
+                        print("Command created successfully")
+                except SQLAlchemyError as e:
+                    print(e)
+            else:
+                print("Command already exists")
+
+app.register_blueprint(resources.LoginBlueprint)
+app.register_blueprint(resources.SettingsBlueprint)
+app.register_blueprint(resources.CommandsBlueprint)
+app.register_blueprint(resources.SearchBlueprint)
+app.register_blueprint(resources.UserBlueprint)
+app.register_blueprint(resources.AdminBlueprint)
+app.register_blueprint(resources.BananaGameBlueprint)
+app.register_blueprint(resources.DevicesBlueprint)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=host_port, debug=True)

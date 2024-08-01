@@ -1,6 +1,8 @@
 from models.search.commands import CommandsModel
 from models.search.requests import RequestsModel
+
 from models.user.users import UsersModel
+from models.user.permission import PermissionsModel
 from models.user.login_attempts import LoginAttemptModel
 
 from models.tracking.tracking_numbers import TrackingNumbersModel

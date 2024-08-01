@@ -1,0 +1,135 @@
+{
+  "commands": [
+    {
+      "category": "default_search",
+      "prefix": ["brave", "b"],
+      "url": "https://search.brave.com/",
+      "search_url": "https://search.brave.com/search?q={}&source=web",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["facebook", "fb"],
+      "url": "https://facebook.com",
+      "search_url": "https://www.facebook.com/search/top/?q={}",
+      "permission_level": 999
+    },
+    {
+      "category": "shortcut",
+      "prefix": ["commands", "cmds", "cmd"],
+      "url": "/internal/search/commands",
+      "permission_level": 999
+    },
+    {
+      "category": "shortcut",
+      "prefix": ["guest"],
+      "url": "https://wiki.spicerhome.net/index.php/Guest_WiFi",
+      "permission_level": 999
+    },
+    {
+      "category": "shortcut",
+      "prefix": ["help"],
+      "url": "https://wiki.spicerhome.net/index.php/SpicerHome_Search",
+      "permission_level": 999
+    },
+    {
+      "category": "shortcut",
+      "prefix": ["profile"],
+      "url": "/profile",
+      "permission_level": 999
+    },
+    {
+      "category": "shortcut",
+      "prefix": ["banana", "bananas"],
+      "url": "/internal/banana/",
+      "permission_level": 999
+    },
+    {
+      "category": "shortcut",
+      "prefix": ["history"],
+      "url": "/internal/search/history",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["wiki", "w"],
+      "url": "https://wiki.spicerhome.net/index.php",
+      "search_url": "https://wiki.spicerhome.net/index.php?search={}",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["yt", "youtube"],
+      "url": "https://www.youtube.com/",
+      "search_url": "https://www.youtube.com/results?search_query={}",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["github", "git", "gh"],
+      "url": "https://github.com/",
+      "search_url": "https://github.com/search?q={}&type=repositories",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["mygithub", "mygit", "mygh"],
+      "url": "https://github.com/RecentRichRail?tab=repositories",
+      "search_url": "https://github.com/search?q=owner%3ARecentRichRail+{}&type=repositories",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["qr", "qrcode"],
+      "url": "https://qrcode.show/",
+      "search_url": "https://qrcode.show/{}",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["google", "g"],
+      "url": "https://google.com/",
+      "search_url": "https://www.google.com/search?q={}",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["ai"],
+      "url": "https://search.brave.com/",
+      "search_url": "https://search.brave.com/search?q={}&source=llmSuggest&summary=1",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["duckduckgo", "ddg"],
+      "url": "https://duckduckgo.com/",
+      "search_url": "https://duckduckgo.com?q={}",
+      "permission_level": 999
+    },
+    {
+      "category": "search",
+      "prefix": ["amazon", "am"],
+      "url": "https://amazon.com/",
+      "search_url": "https://www.amazon.com/s?k={}",
+      "permission_level": 999
+    },
+    {
+      "category": "shortcut",
+      "prefix": ["search"],
+      "url": "/internal/search",
+      "permission_level": 999
+    },
+    {
+      "category": "shortcut",
+      "prefix": ["track", "tracking", "packages"],
+      "url": "/internal/search/track",
+      "permission_level": 999
+    },
+    {
+      "category": "shortcut",
+      "prefix": ["admin"],
+      "url": "/internal/admin",
+      "permission_level": 0
+    }
+  ]
+}

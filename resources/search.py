@@ -1,10 +1,7 @@
 from flask import Blueprint, request, jsonify
-from datetime import datetime, timezone
 import os, importlib.util
 
 from db import db
-from models import RequestsModel, TrackingNumbersModel
-from sqlalchemy.exc import SQLAlchemyError
 
 blp = Blueprint('search', __name__)
 
