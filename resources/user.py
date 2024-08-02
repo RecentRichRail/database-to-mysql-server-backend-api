@@ -21,8 +21,6 @@ def create_user_for_internal(user_sub):
                   "permission_name": "commands",
                   "permission_level": 999}
 
-    # permission = {"user_id": user_sub['sub']}
-
     user_model = UsersModel(**user)
     user_permissions_model = PermissionsModel(**permission)
 
@@ -69,7 +67,6 @@ def get_user():
     user_query = user_query_model.to_dict()
 
     data['user_info'] = {'user_id': user_sub['sub'], 'default_search_id': user_query['default_search_id'],'user_email': {'email': user_sub['email']['address'], 'is_email_valid': user_sub['email']['is_verified']}}
-    # print(data)
 
     user_permissions = []
     permissions_model = PermissionsModel.query.filter_by(user_id=user_sub['sub']).all()
@@ -80,13 +77,11 @@ def get_user():
     data['user_permissions'] = user_permissions
     print(f"User Permissions = {data['user_permissions']}")
 
-    # shortcut_command_model = CommandsModel.query.filter_by(prefix=data['user_query']['prefix']).first()
     user_commands = []
     for permission in data['user_permissions']:
         if permission['permission_name'] == "commands":
             # Retrieve all commands
             commands_model = CommandsModel.query.all()
-            # commands_model = commands_model.to_dict()
             
             for command in commands_model:
                 command_dict = command.to_dict()
@@ -107,19 +102,13 @@ def get_user():
             added_urls.append(command["url"])
 
     data['user_sidebar_links'] = sidebar_links
-    # print(f"Commands - {data['user_commands']}")
 
     return jsonify(data)
 
 @blp.route("/apiv1/data/user/search/history", methods=['POST'])
 def get_user_search_history():
     data = request.json.get("data")
-
-    # response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
-    # user_sub = response.json()
     user_sub = data['user_info']['user_id']
-
-    # user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
     user_history_query = RequestsModel.query.filter_by(user_id=user_sub).order_by(RequestsModel.id.desc()).all()
 
     user_history_query_structured = {user_sub: {}}
@@ -142,21 +131,13 @@ def get_user_search_history():
 @blp.route("/apiv1/data/user/search/track", methods=['POST'])
 def get_user_track_history():
     data = request.json.get("data")
-
-    # response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
-    # user_sub = response.json()
     user_sub = data['user_info']['user_id']
 
-    # user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
     user_track_query = TrackingNumbersModel.query.filter_by(user_id=user_sub).order_by(TrackingNumbersModel.id.desc()).all()
 
-    # if not user_query:
-    #     user_query = create_user(user_sub)
-    # else:
     user_track_query_structured = {user_sub: {}}
     for track_request in user_track_query:
         tracking = get_tracking_number(track_request.tracking_number)
-        # tracking_url = tracking.tracking_url
         user_track_query_structured[user_sub][track_request.id] = {
             "track_id": track_request.id,
             "tracking_number": track_request.tracking_number,
@@ -168,23 +149,6 @@ def get_user_track_history():
 
     print(user_track_query_structured)
     return user_track_query_structured
-
-# @blp.route("/apiv1/data/user/default_search", methods=['POST'])
-# def get_user_default_search():
-#     jwt_token = request.json.get("jwt")
-
-#     response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
-#     user_sub = response.json()
-
-#     user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
-#     user_default_command_query = CommandsModel.query.filter_by(id=user_query.default_search_id).first()
-
-#     print("User default command = ", user_default_command_query.to_dict())
-    
-#     if user_default_command_query:
-#         return user_default_command_query.to_dict()
-#     else:
-#         return {"message": "Something went wrong with userdata"}
 
 @blp.route("/apiv1/data/create_user", methods=['POST'])
 def create_user():

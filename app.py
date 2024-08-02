@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from db import db
 import resources
 
-from models import CommandsModel, PermissionsModel
+from models import CommandsModel
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -48,22 +48,6 @@ with app.app_context():
     except FileNotFoundError:
         logging.error(f"{os.system('pwd')} - Could not find commands.json file.")
         commands_data = {'commands': []}
-
-    # for single_permission in commands_data['permissons']:
-    #     for single_command_single_prefix in single_command['prefix']:
-    #         command_for_data = single_command
-    #         command_for_data['prefix'] = single_command_single_prefix
-    #         cmd_query = CommandsModel.query.filter_by(prefix=command_for_data['prefix']).first()
-    #         if not cmd_query:
-    #             command_model = CommandsModel(category=command_for_data['category'], prefix=command_for_data['prefix'], url=command_for_data['url'], search_url=command_for_data.get('search_url'))
-    #             try:
-    #                 db.session.add(command_model)
-    #                 db.session.commit()
-    #                 print("Command created successfully")
-    #             except SQLAlchemyError as e:
-    #                 print(e)
-    #         else:
-    #             print("Command already exists")
 
     for single_command in commands_data['commands']:
         for single_command_single_prefix in single_command['prefix']:
