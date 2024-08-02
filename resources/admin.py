@@ -1,6 +1,8 @@
 from flask import Blueprint, request, current_app
-from models import UsersModel, RequestsModel
+from models import UsersModel, RequestsModel, TrackingNumbersModel
 from db import db
+
+from tracking_numbers import get_tracking_number
 
 blp = Blueprint('admin', __name__)
 
@@ -46,5 +48,30 @@ def get_user_search_history():
                     "date_and_time": history_request.datetime_of_request
                 }
             return admin_history_query_structured
+    else:
+        return {"message": "No permission for this resource."}
+
+@blp.route("/apiv1/admin/user/track/history", methods=['POST'])
+def get_user_tracking_history():
+    data = request.json.get("data")
+    selected_user = request.json.get("selected_user")
+
+    for permission in data['user_permissions']:
+        if permission['permission_name'] == "admin" and permission['permission_level'] == 0:
+
+            user_track_query = TrackingNumbersModel.query.filter_by(user_id=selected_user).order_by(TrackingNumbersModel.id.desc()).all()
+
+            user_track_query_structured = {selected_user: {}}
+            for track_request in user_track_query:
+                tracking = get_tracking_number(track_request.tracking_number)
+                user_track_query_structured[selected_user][track_request.id] = {
+                    "track_id": track_request.id,
+                    "tracking_number": track_request.tracking_number,
+                    "query_url": tracking.tracking_url,
+                    "courier_name": tracking.courier.name,
+                    "is_active": track_request.is_active,
+                    "datetime_of_create_on_database": track_request.datetime_of_create_on_database
+                }
+            return user_track_query_structured
     else:
         return {"message": "No permission for this resource."}

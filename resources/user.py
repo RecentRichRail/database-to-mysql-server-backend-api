@@ -124,8 +124,6 @@ def get_user_search_history():
             "query_url": user_query_url,
             "date_and_time": history_request.datetime_of_request
         }
-
-    print(user_history_query_structured)
     return user_history_query_structured
 
 @blp.route("/apiv1/data/user/search/track", methods=['POST'])
@@ -146,8 +144,6 @@ def get_user_track_history():
             "is_active": track_request.is_active,
             "datetime_of_create_on_database": track_request.datetime_of_create_on_database
         }
-
-    print(user_track_query_structured)
     return user_track_query_structured
 
 @blp.route("/apiv1/data/create_user", methods=['POST'])
