@@ -98,28 +98,38 @@ def get_user():
                     print(f"No permission to {command.prefix}")
 
     data['user_commands'] = user_commands
-    print(f"Commands - {data['user_commands']}")
+
+    sidebar_links = []
+    added_urls = []
+    for command in data['user_commands']:
+        if command["category"] == "shortcut" and command["url"].startswith("/internal/") and command["url"] not in added_urls:
+            sidebar_links.append({"href": command["url"], "text": command["prefix"].capitalize(), "data_tab": command["prefix"]})
+            added_urls.append(command["url"])
+
+    data['user_sidebar_links'] = sidebar_links
+    # print(f"Commands - {data['user_commands']}")
 
     return jsonify(data)
 
 @blp.route("/apiv1/data/user/search/history", methods=['POST'])
 def get_user_search_history():
-    jwt_token = request.json.get("jwt")
+    data = request.json.get("data")
 
-    response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
-    user_sub = response.json()
+    # response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
+    # user_sub = response.json()
+    user_sub = data['user_info']['user_id']
 
     # user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
-    user_history_query = RequestsModel.query.filter_by(user_id=user_sub['sub']).order_by(RequestsModel.id.desc()).all()
+    user_history_query = RequestsModel.query.filter_by(user_id=user_sub).order_by(RequestsModel.id.desc()).all()
 
-    user_history_query_structured = {user_sub['sub']: {}}
+    user_history_query_structured = {user_sub: {}}
     for history_request in user_history_query:
         if history_request.is_search == True:
             user_query_url = history_request.command.search_url.format(history_request.encoded_query)
         elif history_request.is_search == False:
             user_query_url = history_request.command.url
 
-        user_history_query_structured[user_sub['sub']][history_request.id] = {
+        user_history_query_structured[user_sub][history_request.id] = {
             "request_id": history_request.id,
             "original_request": history_request.original_request,
             "query_url": user_query_url,
@@ -131,22 +141,23 @@ def get_user_search_history():
 
 @blp.route("/apiv1/data/user/search/track", methods=['POST'])
 def get_user_track_history():
-    jwt_token = request.json.get("jwt")
+    data = request.json.get("data")
 
-    response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
-    user_sub = response.json()
+    # response = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
+    # user_sub = response.json()
+    user_sub = data['user_info']['user_id']
 
-    user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
-    user_track_query = TrackingNumbersModel.query.filter_by(user_id=user_sub['sub']).order_by(TrackingNumbersModel.id.desc()).all()
+    # user_query = UsersModel.query.filter_by(id=user_sub['sub']).first()
+    user_track_query = TrackingNumbersModel.query.filter_by(user_id=user_sub).order_by(TrackingNumbersModel.id.desc()).all()
 
     # if not user_query:
     #     user_query = create_user(user_sub)
     # else:
-    user_track_query_structured = {user_sub['sub']: {}}
+    user_track_query_structured = {user_sub: {}}
     for track_request in user_track_query:
         tracking = get_tracking_number(track_request.tracking_number)
         # tracking_url = tracking.tracking_url
-        user_track_query_structured[user_sub['sub']][track_request.id] = {
+        user_track_query_structured[user_sub][track_request.id] = {
             "track_id": track_request.id,
             "tracking_number": track_request.tracking_number,
             "query_url": tracking.tracking_url,
