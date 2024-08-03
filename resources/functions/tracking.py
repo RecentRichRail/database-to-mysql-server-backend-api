@@ -8,7 +8,7 @@ from db import db
 def run(data):
 
     data['tracking_details'] = get_tracking_number(data['user_query']['prefix'].upper())
-    print(f"Tracking.py data - {data}")
+    # print(f"Tracking.py data - {data}")
     if data['tracking_details'] == None:
         return {"funtion_triggered": False}
 

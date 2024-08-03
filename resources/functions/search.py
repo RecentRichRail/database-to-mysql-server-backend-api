@@ -24,29 +24,27 @@ def run(data):
     user_command_model = CommandsModel.query.filter_by(id=user_info['default_search_id']).first()
     user_command = user_command_model.to_dict()
 
-    if current_app.allow_logging:
+    request_dict_format = {
+        "original_request": user_query.get('original_request', "Error"),
+        "user_id": user_info.get('user_id', "Error"),
+        "prefix": user_query.get('prefix', "Error"),
+        "search_query": user_query.get('search_query', "Error"),
+        "encoded_query": user_query.get('encoded_query', "Error"),
+        "is_search": user_query.get('is_search', "Error"),
+        "command_id": user_command.get('id', "Error"),
+        "datetime_of_request": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+            }
 
-        request_dict_format = {
-            "original_request": user_query.get('original_request', "Error"),
-            "user_id": user_info.get('user_id', "Error"),
-            "prefix": user_query.get('prefix', "Error"),
-            "search_query": user_query.get('search_query', "Error"),
-            "encoded_query": user_query.get('encoded_query', "Error"),
-            "is_search": user_query.get('is_search', "Error"),
-            "command_id": user_command.get('id', "Error"),
-            "datetime_of_request": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
-                }
+    print("search_request data = ", request_dict_format)
 
-        print("search_request data = ", request_dict_format)
+    request_model = RequestsModel(**request_dict_format)
 
-        request_model = RequestsModel(**request_dict_format)
-
-        try:
-            db.session.add(request_model)
-            db.session.commit()
-            print("Search request recorded.")
-        except SQLAlchemyError as e:
-            print(e)
-            print("Failed to record search request.")
+    try:
+        db.session.add(request_model)
+        db.session.commit()
+        print("Search request recorded.")
+    except SQLAlchemyError as e:
+        print(e)
+        print("Failed to record search request.")
 
     return {"funtion_triggered": True, "funtion_return": user_command['search_url'].format(user_query['encoded_query'])}

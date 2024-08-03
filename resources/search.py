@@ -42,5 +42,13 @@ def user_search_query():
                 return jsonify({"error": str(e)}), 500
             
     print(f"Running 'search.py'")
-    print({"redirect_url": run_funtion(os.path.join('resources/functions', 'search.py'), data)['funtion_return']})
+    script_path = os.path.join('resources/functions', 'search.py')
+    try:
+        script_return = run_funtion(script_path, data)
+        if script_return.get("funtion_triggered"):
+            return jsonify({"redirect_url": script_return['funtion_return']})
+    except Exception as e:
+                print(f"Error running {filename}: {e}")
+                return jsonify({"error": str(e)}), 500
+    # print({"redirect_url": run_funtion(os.path.join('resources/functions', 'search.py'), data)['funtion_return']})
     return jsonify({"redirect_url": run_funtion(os.path.join('resources/functions', 'search.py'), data)['funtion_return']})
