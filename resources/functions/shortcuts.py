@@ -16,6 +16,8 @@ def run(data):
     if data['user_query']['search_query'] == "":
         data['user_query']['search_query'] = None
         data['user_query']['is_search'] = False
+    else:
+        data['user_query']['is_search'] = True
 
     # print(data['user_commands'])
 
