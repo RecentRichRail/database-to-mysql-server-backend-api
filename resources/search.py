@@ -20,7 +20,7 @@ def run_funtion(script_path, data):
 @blp.route("/apiv1/search/query", methods=['POST'])
 def user_search_query():
     data = request.get_json()
-    print(f"Data received: {data}")
+    # print(f"Data received: {data}")
     data['user_query']['prefix'] = data['user_query']['original_request'].split(' ')[0].lower()
 
     # Should be how the data looks:

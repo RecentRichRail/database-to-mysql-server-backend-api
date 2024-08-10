@@ -38,7 +38,7 @@ def run(data):
         "datetime_of_request": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
             }
 
-    print("search_request data = ", request_dict_format)
+    # print("search_request data = ", request_dict_format)
 
     request_model = RequestsModel(**request_dict_format)
 
