@@ -7,8 +7,6 @@ import requests
 from models import UsersModel, CommandsModel, RequestsModel
 from db import db
 
-from brave import Brave
-
 def run(data):
 
     user_query = data['user_query']
