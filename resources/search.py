@@ -21,7 +21,6 @@ def run_funtion(script_path, data):
 def user_search_query():
     data = request.get_json()
     print(f"Data received: {data}")
-
     data['user_query']['prefix'] = data['user_query']['original_request'].split(' ')[0].lower()
 
     # Should be how the data looks:
@@ -36,7 +35,7 @@ def user_search_query():
             try:
                 script_return = run_funtion(script_path, data)
                 if script_return.get("funtion_triggered"):
-                    return jsonify({"redirect_url": script_return['funtion_return']})
+                    return jsonify({"internal_search": script_return.get("internal_search", False), "function_data": script_return['funtion_return']})
             except Exception as e:
                 print(f"Error running {filename}: {e}")
                 return jsonify({"error": str(e)}), 500
@@ -45,10 +44,11 @@ def user_search_query():
     script_path = os.path.join('resources/functions', 'search.py')
     try:
         script_return = run_funtion(script_path, data)
+        # print(f"script_return: {script_return}")
         if script_return.get("funtion_triggered"):
-            return jsonify({"redirect_url": script_return['funtion_return']})
+            return jsonify({"internal_search": script_return.get("internal_search", False), "function_data": script_return['funtion_return']})
     except Exception as e:
-                print(f"Error running {filename}: {e}")
+                print(f"Error running search.py: {e}")
                 return jsonify({"error": str(e)}), 500
     # print({"redirect_url": run_funtion(os.path.join('resources/functions', 'search.py'), data)['funtion_return']})
-    return jsonify({"redirect_url": run_funtion(os.path.join('resources/functions', 'search.py'), data)['funtion_return']})
+    return jsonify({"internal_search": script_return.get("internal_search", False), "function_data": run_funtion(os.path.join('resources/functions', 'search.py'), data)['funtion_return']})

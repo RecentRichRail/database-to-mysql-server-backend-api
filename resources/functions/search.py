@@ -2,14 +2,18 @@ import urllib.parse
 from flask import current_app
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timezone
+import requests
 
 from models import UsersModel, CommandsModel, RequestsModel
 from db import db
 
+from brave import Brave
+
 def run(data):
 
     user_query = data['user_query']
-    print(user_query)
+    user_offset = data['user_query']['offset']
+    # print(user_query)
     user_info = data['user_info']
 
     user_query['search_query'] = user_query['original_request'].replace(user_query['prefix'], '', 1).strip()
@@ -18,6 +22,7 @@ def run(data):
         user_query['is_search'] = False
 
     user_query['search_query'] = user_query['original_request']
+    user_query_original_request = user_query['original_request']
     user_query['encoded_query'] = urllib.parse.quote_plus(user_query['search_query'])
     user_query['is_search'] = True
 
@@ -46,5 +51,29 @@ def run(data):
     except SQLAlchemyError as e:
         print(e)
         print("Failed to record search request.")
+    
+    # if user_command['url'] != "/internal/search":
+    #     return {"funtion_triggered": True, "funtion_return": user_command['search_url'].format(user_query['encoded_query'])}
+    
+    else:
+        # for permission in data['user_permissions']:
+        #     if permission['permission_name'] == "commands" and permission['permission_level'] <= 50:
+        base_url = "https://api.search.brave.com/res/v1/"
+        endpoint = "web"
+        url = base_url + endpoint + "/search"
+        headers = {"Accept": "application/json", "Accept-Encoding": "gzip", "X-Subscription-Token": current_app.BRAVE_API_KEY}
 
-    return {"funtion_triggered": True, "funtion_return": user_command['search_url'].format(user_query['encoded_query'])}
+        params = {"q": user_query_original_request,"country": "US","search_lang": "en","ui_lang": "en-US","count": 20,"offset": user_offset,"safesearch": "strict","freshness": None,"text_decorations": None,"spellcheck": True,"result_filter": "web","goggles_id": None,"units": None,"extra_snippets": None}
+        params = {k: v for k, v in params.items() if v is not None}
+
+        response = requests.get(url, headers=headers, params=params)
+        search_results = response.json()
+
+
+        # search_results = Brave().search(q=user_query, count=20, offset=user_offset)
+        # print(search_results)
+        return {"funtion_triggered": True, "internal_search": True, "funtion_return": search_results}
+
+            # else:
+            #     return {"funtion_triggered": True, "funtion_return": f"/internal/search?q=b {user_query_original_request}"}
+        # pass

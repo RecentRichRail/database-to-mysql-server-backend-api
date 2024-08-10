@@ -24,7 +24,7 @@ def run(data):
 
 
 
-    track_query = TrackingNumbersModel.query.filter_by(tracking_number=data['tracking_details'].number).first()
+    track_query = TrackingNumbersModel.query.filter_by(tracking_number=data['tracking_details'].number,user_id=data['user_info']['user_id']).first()
     if track_query:
         print({"message": "Track request previously recorded."})
         return {"funtion_triggered": True, "funtion_return": "/internal/search/track"}

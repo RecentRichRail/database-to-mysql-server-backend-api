@@ -7,3 +7,4 @@ flask_sqlalchemy
 pymysql
 cryptography
 tracking_numbers
+brave-search

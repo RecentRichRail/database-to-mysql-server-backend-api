@@ -1,7 +1,7 @@
 {
   "commands": [
     {
-      "category": "default_search",
+      "category": "search",
       "prefix": ["brave", "b"],
       "url": "https://search.brave.com/",
       "search_url": "https://search.brave.com/search?q={}&source=web",
@@ -115,12 +115,6 @@
     },
     {
       "category": "shortcut",
-      "prefix": ["search"],
-      "url": "/internal/search",
-      "permission_level": 999
-    },
-    {
-      "category": "shortcut",
       "prefix": ["track", "tracking", "packages"],
       "url": "/internal/search/track",
       "permission_level": 999
@@ -130,6 +124,13 @@
       "prefix": ["admin"],
       "url": "/internal/admin",
       "permission_level": 0
+    },
+    {
+      "category": "default_search",
+      "prefix": ["search"],
+      "url": "/internal/search",
+      "search_url": "/internal/search?q={}&offset=0",
+      "permission_level": 999
     }
   ]
 }

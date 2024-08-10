@@ -60,7 +60,12 @@ def run(data):
         print("Failed to record search request.")
         print({"message": "Failed to record search request."})
 
+    # if shortcut_command['search_url'].beginswith("/internal/search?"):
+    #     "internal_search": script_return.get("internal_search", False),
+
     if data['user_query']['is_search']:
+        # if "/internal/search" == shortcut_command['url']:
+        #     return {"internal_search": True, "funtion_triggered": True, "funtion_return": shortcut_command['search_url'].format(data['user_query']['encoded_query'])}
         # logging.info(f"redirecting to {shortcut_command['search_url'].format(data['user_query']['encoded_query'])}")
         return {"funtion_triggered": True, "funtion_return": shortcut_command['search_url'].format(data['user_query']['encoded_query'])}
 
