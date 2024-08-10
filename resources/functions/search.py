@@ -73,5 +73,5 @@ def run(data):
         return {"funtion_triggered": True, "internal_search": True, "funtion_return": search_results}
 
     else:
-        return {"funtion_triggered": True, "funtion_return": f"/internal/search?q=b {user_query_original_request}"}
+        return {"funtion_triggered": True, "funtion_return": user_command['search_url'].format(user_query['encoded_query'])}
         # pass
