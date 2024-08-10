@@ -53,7 +53,7 @@ def run(data):
     # if user_command['url'] != "/internal/search":
     #     return {"funtion_triggered": True, "funtion_return": user_command['search_url'].format(user_query['encoded_query'])}
     
-    else:
+    if user_command['category'] == "default_search":
         # for permission in data['user_permissions']:
         #     if permission['permission_name'] == "commands" and permission['permission_level'] <= 50:
         base_url = "https://api.search.brave.com/res/v1/"
@@ -72,6 +72,6 @@ def run(data):
         # print(search_results)
         return {"funtion_triggered": True, "internal_search": True, "funtion_return": search_results}
 
-            # else:
-            #     return {"funtion_triggered": True, "funtion_return": f"/internal/search?q=b {user_query_original_request}"}
+    else:
+        return {"funtion_triggered": True, "funtion_return": f"/internal/search?q=b {user_query_original_request}"}
         # pass
