@@ -55,6 +55,29 @@ def create_user_banana_game_with_id(user_id):
     except SQLAlchemyError as e:
         print(e)
 
+@blp.route("/apiv1/data/user/change_default_search", methods=['POST'])
+def change_user_default_command():
+    print('Request Incoming')
+    jwt_token = request.json.get("jwt_token")
+    new_search_id = request.json.get("search_id")
+
+    payload = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
+    user_sub = payload.json()
+
+    if user_sub:
+        user_model = UsersModel.query.filter_by(id=user_sub['sub']).first()
+
+
+        user_model.default_search_id = new_search_id
+
+        try:
+            db.session.commit()
+            return {"message": "Success"}, 200
+        except SQLAlchemyError as e:
+            print(e)
+            return {"message": "Error"}
+    return {"message": "Error"}
+
 @blp.route("/apiv1/data/user", methods=['POST'])
 def get_user():
     jwt_token = request.json.get("jwt")
@@ -102,6 +125,23 @@ def get_user():
             added_urls.append(command["url"])
 
     data['user_sidebar_links'] = sidebar_links
+
+    user_search_commands = []
+    added_urls = []
+
+    for command in data['user_commands']:
+        if "search" in command["category"]:
+            if command["url"] in added_urls:
+                for user_command in user_search_commands:
+                    if user_command["id"] == command["id"]:
+                        if len(command["prefix"]) > len(user_command["text"]):
+                            user_command["text"] = command["prefix"].capitalize()
+                        break
+            else:
+                user_search_commands.append({"id": command["id"], "text": command["prefix"].capitalize(), "prefix": command["prefix"]})
+                added_urls.append(command["url"])
+
+    data['user_search_commands'] = user_search_commands
 
     return jsonify(data)
 
