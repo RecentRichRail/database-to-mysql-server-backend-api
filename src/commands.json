@@ -96,7 +96,7 @@
       "category": "search",
       "prefix": ["ai", "chatgpt", "gpt"],
       "url": "https://chatgpt.com/",
-      "search_url": "https://chatgpt.com/?q=%s",
+      "search_url": "https://chatgpt.com/?q={}",
       "permission_level": 999
     },
     {
