@@ -94,9 +94,9 @@
     },
     {
       "category": "search",
-      "prefix": ["ai"],
-      "url": "https://search.brave.com/",
-      "search_url": "https://search.brave.com/search?q={}&source=llmSuggest&summary=1",
+      "prefix": ["ai", "chatgpt", "gpt"],
+      "url": "https://chatgpt.com/",
+      "search_url": "https://chatgpt.com/?q=%s",
       "permission_level": 999
     },
     {
