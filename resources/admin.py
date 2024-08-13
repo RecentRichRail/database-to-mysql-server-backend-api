@@ -76,7 +76,7 @@ def get_user_tracking_history():
     else:
         return {"message": "No permission for this resource."}
     
-@blp.route("/apiv1/admin/user/login/requests", methods=['POST'])
+@blp.route("/apiv1/admin/user/login/requests_unauth", methods=['POST'])
 def get_user_login_requests():
     data = request.json.get("data")
     # selected_user = request.json.get("selected_user")
