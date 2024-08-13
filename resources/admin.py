@@ -76,27 +76,26 @@ def get_user_tracking_history():
     else:
         return {"message": "No permission for this resource."}
     
-# @blp.route("/apiv1/admin/user/login/requests", methods=['POST'])
-# def get_user_login_requests():
-#     data = request.json.get("data")
-#     selected_user = request.json.get("selected_user")
+@blp.route("/apiv1/admin/user/login/requests", methods=['POST'])
+def get_user_login_requests():
+    data = request.json.get("data")
+    # selected_user = request.json.get("selected_user")
 
-#     for permission in data['user_permissions']:
-#         if permission['permission_name'] == "admin" and permission['permission_level'] == 0:
+    for permission in data['user_permissions']:
+        if permission['permission_name'] == "admin" and permission['permission_level'] == 0:
 
-#             user_login_query = LoginAttemptModel.query.filter_by(user_id=selected_user).order_by(LoginAttemptModel.id.desc()).all()
+            user_login_query = LoginAttemptModel.query.order_by(LoginAttemptModel.login_attempt_id.desc()).all()
 
-#             user_login_query_structured = {selected_user: {}}
-#             for login_request in user_login_query:
-#                 # tracking = get_tracking_number(track_request.tracking_number)
-#                 user_login_query_structured[selected_user][login_request.login_attempt_id] = {
-#                     "login_attempt_id": login_request.login_attempt_id,
-#                     "user_id": login_request.user_id,
-#                     "is_authenticated": login_request.is_authenticated,
-#                     "requested_resource": login_request.requested_resource,
-#                     "request_ip_source": login_request.request_ip_source,
-#                     "datetime_of_login_attempt": login_request.datetime_of_login_attempt
-#                 }
-#             return user_login_query_structured
-#     else:
-#         return {"message": "No permission for this resource."}
+            user_login_query_structured = {}
+            for login_request in user_login_query:
+                user_login_query_structured[login_request.login_attempt_id] = {
+                    "login_attempt_id": login_request.login_attempt_id,
+                    "user_id": login_request.user_id,
+                    "is_authenticated": login_request.is_authenticated,
+                    "requested_resource": login_request.requested_resource,
+                    "request_ip_source": login_request.request_ip_source,
+                    "datetime_of_login_attempt": login_request.datetime_of_login_attempt
+                }
+            return user_login_query_structured
+    else:
+        return {"message": "No permission for this resource."}

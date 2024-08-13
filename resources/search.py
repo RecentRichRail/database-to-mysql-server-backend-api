@@ -11,7 +11,6 @@ def run_funtion(script_path, data):
     spec.loader.exec_module(module)
     return module.run(data)
 
-# May need to turn this into a "POST" request
 # Thinking on having "Functions" - When a query is sent from the search it loops through funtions
 # This will also allow a future UI editor - Create a funtion, the function gets added to codebase, funtion runs
 # The actual search will need to be a funtion rather than the logic being done on the front-end
