@@ -87,15 +87,23 @@ def get_user_login_requests():
             user_login_query = LoginAttemptModel.query.order_by(LoginAttemptModel.login_attempt_id.desc()).all()
 
             user_login_query_structured = {}
+            user_login_dict_with_ip = {}
+
             for login_request in user_login_query:
-                user_login_query_structured[login_request.login_attempt_id] = {
-                    "login_attempt_id": login_request.login_attempt_id,
-                    "user_id": login_request.user_id,
-                    "is_authenticated": login_request.is_authenticated,
-                    "requested_resource": login_request.requested_resource,
-                    "request_ip_source": login_request.request_ip_source,
-                    "datetime_of_login_attempt": login_request.datetime_of_login_attempt
-                }
+                if login_request.is_authenticated:
+                    user_login_dict_with_ip[login_request.request_ip_source] = login_request.user_id
+
+            for login_request in user_login_query:
+                if login_request.request_ip_source not in user_login_dict_with_ip and login_request.is_authenticated == False:
+                    user_login_query_structured[login_request.login_attempt_id] = {
+                        "login_attempt_id": login_request.login_attempt_id,
+                        "user_id": login_request.user_id,
+                        "is_authenticated": login_request.is_authenticated,
+                        "requested_resource": login_request.requested_resource,
+                        "request_ip_source": login_request.request_ip_source,
+                        "datetime_of_login_attempt": login_request.datetime_of_login_attempt
+                    }
+
             return user_login_query_structured
     else:
         return {"message": "No permission for this resource."}
