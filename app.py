@@ -24,6 +24,7 @@ app.mysql_database_api = os.environ.get('mysql_database_api')
 app.allow_logging = os.environ.get('allow_logging')
 app.public_verification_key = os.environ.get('public_verification_key')
 app.BRAVE_API_KEY = os.environ.get('BRAVE_API_KEY')
+app.dev_server = os.environ.get('dev_server')
 
 app.config["SQLALCHEMY_DB_HOST"] = os.environ.get('SQLALCHEMY_DB_HOST')
 app.config["SQLALCHEMY_DB_USER"] = os.environ.get('SQLALCHEMY_DB_USER')
