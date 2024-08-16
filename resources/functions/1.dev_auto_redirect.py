@@ -2,7 +2,7 @@ from flask import current_app
 import requests
 
 def run(data):
-    if data["user_active_env"] != "prod":
+    if data["user_active_env"] == "prod":
         for permission in data['user_permissions']:
             if permission['permission_name'] == "dev" and permission['permission_level'] <= 999:
                 response = requests.get(f"{current_app.dev_server}/external/status")
