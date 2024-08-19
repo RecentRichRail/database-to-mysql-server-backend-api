@@ -55,6 +55,35 @@ def create_user_banana_game_with_id(user_id):
     except SQLAlchemyError as e:
         print(e)
 
+@blp.route('/apiv1/data/user/change_theme', methods=['POST'])
+def change_theme():
+    selected_theme = request.json.get('theme')
+    jwt_token = request.json.get("jwt_token")
+
+    theme_list = ['coffee', 'mignight']
+
+    if str(selected_theme) not in theme_list:
+        print("selected_theme")
+        return {"message": "Error"}
+
+    payload = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
+    user_sub = payload.json()
+
+    if user_sub:
+        user_model = UsersModel.query.filter_by(id=user_sub['sub']).first()
+
+
+        user_model.user_theme = selected_theme
+
+        try:
+            db.session.commit()
+            print(selected_theme)
+            return {'message': 'success', 'theme': selected_theme}, 200
+        except SQLAlchemyError as e:
+            print(e)
+            return {"message": "Error"}
+    return {"message": "Error"}
+
 @blp.route("/apiv1/data/user/change_default_search", methods=['POST'])
 def change_user_default_command():
     print('Request Incoming')
@@ -89,7 +118,13 @@ def get_user():
     user_query_model = UsersModel.query.filter_by(id=user_sub['sub']).first()
     user_query = user_query_model.to_dict()
 
-    data['user_info'] = {'user_id': user_sub['sub'], 'default_search_id': user_query['default_search_id'],'user_email': {'email': user_sub['email']['address'], 'is_email_valid': user_sub['email']['is_verified']}}
+    data['user_info'] = {
+        'user_id': user_sub['sub'],
+        'default_search_id': user_query['default_search_id'],
+        'user_theme': user_query['user_theme'],
+        'user_email': {'email': user_sub['email']['address'],
+        'is_email_valid': user_sub['email']['is_verified']}
+        }
 
     user_permissions = []
     permissions_model = PermissionsModel.query.filter_by(user_id=user_sub['sub']).all()
