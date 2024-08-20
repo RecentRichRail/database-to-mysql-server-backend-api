@@ -60,7 +60,7 @@ def change_theme():
     selected_theme = request.json.get('theme')
     jwt_token = request.json.get("jwt_token")
 
-    theme_list = ['coffee', 'mignight']
+    theme_list = ['coffee', 'mignight', 'dark']
 
     if str(selected_theme) not in theme_list:
         print("selected_theme")
