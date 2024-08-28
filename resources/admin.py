@@ -37,7 +37,10 @@ def get_user_search_history():
             admin_history_query_structured = {selected_user: {}}
             for history_request in admin_history_query:
                 if history_request.is_search == True:
-                    user_query_url = history_request.command.search_url.format(history_request.encoded_query)
+                    try:
+                        user_query_url = history_request.command.search_url.format(history_request.encoded_query)
+                    except AttributeError:
+                        user_query_url = history_request.command.url
                 elif history_request.is_search == False:
                     user_query_url = history_request.command.url
 
