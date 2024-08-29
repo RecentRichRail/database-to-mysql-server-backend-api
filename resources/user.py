@@ -229,16 +229,17 @@ def get_user_track_history():
 def tracking_update_note():
     track_id = request.json.get('track_id')
     updated_note = request.json.get('updated_note')
+    print(updated_note)
     jwt_token = request.json.get("jwt_token")
 
-    if updated_note.length() > 5000:
+    if len(updated_note) > 5000:
         return {"message": "Error"}
 
     payload = requests.post(f"http://{current_app.authentication_server}/apiv1/auth/get_user_info", json={"jwt": jwt_token})
     user_sub = payload.json()
 
     if user_sub:
-        selected_package = TrackingNumbersModel.query.filter_by(track_id=track_id).first()
+        selected_package = TrackingNumbersModel.query.filter_by(id=track_id).first()
         if selected_package.user_id == user_sub['sub']:
             selected_package.note = updated_note
             try:

@@ -72,6 +72,7 @@ def get_user_tracking_history():
                     "tracking_number": track_request.tracking_number,
                     "query_url": tracking.tracking_url,
                     "courier_name": tracking.courier.name,
+                    "note": track_request.note,
                     "is_active": track_request.is_active,
                     "datetime_of_create_on_database": track_request.datetime_of_create_on_database
                 }
