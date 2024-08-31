@@ -64,7 +64,7 @@ def run(data):
         url = base_url + endpoint + "/search"
         headers = {"Accept": "application/json", "Accept-Encoding": "gzip", "X-Subscription-Token": current_app.BRAVE_API_KEY}
 
-        params = {"q": user_query_original_request,"country": "US","search_lang": "en","ui_lang": "en-US","count": 20,"offset": user_offset,"safesearch": "strict","freshness": None,"text_decorations": None,"spellcheck": True,"result_filter": "web,videos","goggles_id": None,"units": None,"extra_snippets": None}
+        params = {"q": user_query_original_request,"country": "US","search_lang": "en","ui_lang": "en-US","count": 20,"offset": user_offset,"safesearch": "strict","freshness": None,"text_decorations": None,"result_filter": "web,videos","goggles_id": None,"units": None,"extra_snippets": None}
         params = {k: v for k, v in params.items() if v is not None}
 
         response = requests.get(url, headers=headers, params=params)
